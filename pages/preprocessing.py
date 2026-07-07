@@ -25,7 +25,7 @@ def show_preprocessing():
     st.title("🔄 Preprocessing")
 
     st.write("Lakukan preprocessing pada seluruh dataset sebelum proses augmentasi dan klasifikasi.")
-
+    dataset_path = os.path.join(DATASET_PATH, "train")
     # =====================================
     # Tombol Preprocessing
     # =====================================
@@ -54,14 +54,14 @@ def show_preprocessing():
 
         progress_text = st.empty()
 
-        classes = sorted(os.listdir(DATASET_PATH))
+        classes = sorted(os.listdir(dataset_path))
 
         total_class = len(classes)
 
         for index, class_name in enumerate(classes):
 
             class_path = os.path.join(
-                DATASET_PATH,
+                dataset_path,
                 class_name
             )
 
@@ -180,12 +180,17 @@ def show_preprocessing():
 
     for i, class_name in enumerate(classes):
 
-        img_name = os.listdir(
+        images = os.listdir(
             os.path.join(
                 PREPROCESS_PATH,
                 class_name
             )
-        )[0]
+        )
+
+        if len(images) == 0:
+            continue
+
+        img_name = images[0]
 
         img_path = os.path.join(
             PREPROCESS_PATH,
@@ -194,6 +199,9 @@ def show_preprocessing():
         )
 
         img = cv2.imread(img_path)
+
+        if img is None:
+            continue
 
         img = cv2.cvtColor(
             img,
