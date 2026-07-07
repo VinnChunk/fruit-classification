@@ -17,7 +17,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
+from sklearn.svm import SVC, LinearSVC
 from sklearn.neural_network import MLPClassifier
 
 from sklearn.metrics import (
@@ -255,13 +255,16 @@ def train_svm(
 
     for kernel in kernels:
 
-        svm = SVC(
-
-            kernel=kernel,
-
-            random_state=42
-
-        )
+        if kernel == "linear":
+            svm = LinearSVC(
+                random_state=42,
+                max_iter=5000
+            )
+        else:
+            svm = SVC(
+                kernel=kernel,
+                random_state=42
+            )
 
         svm.fit(
 
