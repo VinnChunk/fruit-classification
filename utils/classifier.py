@@ -12,6 +12,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import joblib
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -67,7 +68,7 @@ def load_dataset(dataset_path, img_size):
             img = cv2.imread(image_path)
 
             if img is None:
-                continue
+                raise ValueError(f"Gagal membaca gambar: {image_path}")
 
             img = cv2.cvtColor(
                 img,
@@ -160,6 +161,8 @@ def train_knn(
 
     best_prediction = None
 
+    best_model = None
+
     result = []
 
     for k in [1,3,5,7]:
@@ -210,7 +213,11 @@ def train_knn(
 
             best_prediction = prediction
 
+            best_model = knn
+
     return (
+
+        best_model,
 
         best_k,
 
@@ -221,6 +228,7 @@ def train_knn(
         result
 
     )
+    
 
 
 # ==========================================
@@ -241,7 +249,8 @@ def train_svm(
 
     kernels = [
 
-        "linear"
+        "linear",
+         "poly"
 
     ]
 
@@ -250,6 +259,8 @@ def train_svm(
     best_kernel = ""
 
     best_prediction = None
+
+    best_model = None
 
     result = []
 
@@ -304,7 +315,11 @@ def train_svm(
 
             best_prediction = prediction
 
+            best_model = svm
+
     return (
+
+        best_model,
 
         best_kernel,
 
@@ -370,6 +385,8 @@ def train_ann(
     )
 
     return (
+
+        ann,
 
         accuracy,
 
@@ -459,3 +476,95 @@ def compare_models(
         ]
 
     })
+
+def save_model(model, encoder, filename):
+
+    joblib.dump(
+        {
+            "model": model,
+            "encoder": encoder
+        },
+        filename
+    )
+
+def load_model(filename):
+
+    data = joblib.load(filename)
+
+    model = data["model"]
+    encoder = data["encoder"]
+
+    return model, encoder
+
+def preprocess_input_image(image_path, img_size):
+
+    img = cv2.imread(image_path)
+
+    if img is None:
+        raise ValueError(f"Gagal membaca gambar: {image_path}")
+
+    img = cv2.cvtColor(
+        img,
+        cv2.COLOR_BGR2RGB
+    )
+
+    img = cv2.resize(
+        img,
+        (img_size,img_size)
+    )
+
+
+    img = img.reshape(
+        1,
+        -1
+    )
+
+
+    return img
+
+def predict_image(
+    model,
+    encoder,
+    image_path,
+    img_size
+):
+
+    image = preprocess_input_image(
+        image_path,
+        img_size
+    )
+
+
+    prediction = model.predict(
+        image
+    )
+
+
+    label = encoder.inverse_transform(
+        prediction
+    )
+
+
+    return label[0]
+
+def split_label(label):
+
+    if label.startswith("Fresh"):
+
+        fruit = label.replace("Fresh", "")
+
+        condition = "Fresh"
+
+    elif label.startswith("Rotten"):
+
+        fruit = label.replace("Rotten", "")
+
+        condition = "Rotten"
+
+    else:
+
+        fruit = label
+
+        condition = "Unknown"
+
+    return fruit, condition

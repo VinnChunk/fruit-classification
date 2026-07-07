@@ -28,10 +28,11 @@ from utils.classifier import (
 
     plot_confusion_matrix,
 
-    compare_models
+    compare_models,
+
+    save_model
 
 )
-
 
 def show_classification():
 
@@ -171,6 +172,7 @@ def show_classification():
     with st.spinner("Training KNN..."):
 
         (
+            best_knn_model,
             best_k,
             best_knn_accuracy,
             best_knn_pred,
@@ -181,6 +183,15 @@ def show_classification():
             X_test,
             y_train,
             y_test
+
+        )
+        save_model(
+
+            best_knn_model,
+
+            encoder,
+
+            "models/knn.pkl"
 
         )
 
@@ -223,11 +234,11 @@ def show_classification():
     with st.spinner("Training SVM..."):
 
         (
+            best_svm_model,
             best_kernel,
             best_svm_accuracy,
             best_svm_pred,
             svm_results
-
         ) = train_svm(
 
             X_train,
@@ -236,6 +247,15 @@ def show_classification():
             y_test
 
         )
+    save_model(
+
+        best_svm_model,
+
+        encoder,
+
+        "models/svm.pkl"
+
+    )
 
     st.dataframe(
         svm_results,
@@ -275,7 +295,7 @@ def show_classification():
 
     with st.spinner("Training ANN..."):
 
-        ann_accuracy, ann_pred = train_ann(
+        ann_model, ann_accuracy, ann_pred = train_ann(
 
             X_train,
             X_test,
@@ -283,6 +303,15 @@ def show_classification():
             y_test
 
         )
+    save_model(
+
+        ann_model,
+
+        encoder,
+
+        "models/ann.pkl"
+
+    )
 
     st.success(
         f"Accuracy : {ann_accuracy:.4f}"
