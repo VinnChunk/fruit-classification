@@ -12,13 +12,13 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import joblib
+import streamlit as st
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC, LinearSVC
+from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
 
 from sklearn.metrics import (
@@ -266,16 +266,11 @@ def train_svm(
 
     for kernel in kernels:
 
-        if kernel == "linear":
-            svm = LinearSVC(
-                random_state=42,
-                max_iter=5000
-            )
-        else:
-            svm = SVC(
-                kernel=kernel,
-                random_state=42
-            )
+        svm = SVC(
+            kernel=kernel,
+            probability=True,
+            random_state=42
+        )
 
         svm.fit(
 
@@ -394,7 +389,67 @@ def train_ann(
 
     )
 
+@st.cache_data(show_spinner=False)
+def load_cached_dataset(dataset_path, img_size):
 
+    return load_dataset(
+        dataset_path,
+        img_size
+    )
+
+@st.cache_resource(show_spinner=False)
+def get_model(
+    model_name,
+    dataset_path,
+    img_size
+):
+
+    images, labels = load_cached_dataset(
+        dataset_path,
+        img_size
+    )
+
+    (
+        images,
+        labels,
+        encoder,
+        X_train,
+        X_test,
+        y_train,
+        y_test
+    ) = prepare_dataset(
+        images,
+        labels
+    )
+
+    if model_name == "KNN":
+
+        model, _, _, _, _ = train_knn(
+            X_train,
+            X_test,
+            y_train,
+            y_test
+        )
+
+    elif model_name == "SVM":
+
+        model, _, _, _, _ = train_svm(
+            X_train,
+            X_test,
+            y_train,
+            y_test
+        )
+
+    else:
+
+        model, _, _ = train_ann(
+            X_train,
+            X_test,
+            y_train,
+            y_test
+        )
+
+    return model, encoder
 # ==========================================
 # Confusion Matrix
 # ==========================================
@@ -477,25 +532,6 @@ def compare_models(
 
     })
 
-def save_model(model, encoder, filename):
-
-    joblib.dump(
-        {
-            "model": model,
-            "encoder": encoder
-        },
-        filename
-    )
-
-def load_model(filename):
-
-    data = joblib.load(filename)
-
-    model = data["model"]
-    encoder = data["encoder"]
-
-    return model, encoder
-
 def preprocess_input_image(image_path, img_size):
 
     img = cv2.imread(image_path)
@@ -534,18 +570,19 @@ def predict_image(
         img_size
     )
 
+    prediction = model.predict(image)
 
-    prediction = model.predict(
-        image
-    )
+    label = encoder.inverse_transform(prediction)[0]
 
+    confidence = None
 
-    label = encoder.inverse_transform(
-        prediction
-    )
+    if hasattr(model, "predict_proba"):
 
+        confidence = np.max(
+            model.predict_proba(image)
+        )
 
-    return label[0]
+    return label, confidence
 
 def split_label(label):
 
@@ -568,3 +605,4 @@ def split_label(label):
         condition = "Unknown"
 
     return fruit, condition
+

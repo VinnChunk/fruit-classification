@@ -10,6 +10,7 @@ Original file is located at
 import streamlit as st
 
 from pages.home import show_home
+from pages.prediction import show_prediction
 from pages.dataset import show_dataset
 from pages.preprocessing import show_preprocessing
 from pages.augmentation import show_augmentation
@@ -28,11 +29,12 @@ menu = st.sidebar.radio(
     "Menu",
     [
         "Home",
+        "Prediction",
         "Dataset",
         "Preprocessing",
         "Augmentation",
         "Classification",
-        "Comparison"
+        "Comparison"    
     ]
 )
 
@@ -41,6 +43,9 @@ if menu == "Home":
 
 elif menu == "Dataset":
     show_dataset()
+
+elif menu == "Prediction":
+    show_prediction()
 
 elif menu == "Preprocessing":
     show_preprocessing()

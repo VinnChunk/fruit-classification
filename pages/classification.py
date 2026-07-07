@@ -28,9 +28,7 @@ from utils.classifier import (
 
     plot_confusion_matrix,
 
-    compare_models,
-
-    save_model
+    compare_models
 
 )
 
@@ -185,15 +183,6 @@ def show_classification():
             y_test
 
         )
-        save_model(
-
-            best_knn_model,
-
-            encoder,
-
-            "models/knn.pkl"
-
-        )
 
     st.dataframe(
         knn_results,
@@ -247,15 +236,6 @@ def show_classification():
             y_test
 
         )
-    save_model(
-
-        best_svm_model,
-
-        encoder,
-
-        "models/svm.pkl"
-
-    )
 
     st.dataframe(
         svm_results,
@@ -303,15 +283,6 @@ def show_classification():
             y_test
 
         )
-    save_model(
-
-        ann_model,
-
-        encoder,
-
-        "models/ann.pkl"
-
-    )
 
     st.success(
         f"Accuracy : {ann_accuracy:.4f}"
