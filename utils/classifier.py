@@ -572,36 +572,27 @@ def predict_image(
 
     prediction = model.predict(image)
 
-    label = encoder.inverse_transform(prediction)[0]
+    label = encoder.inverse_transform(prediction)
 
-    confidence = None
-
-    if hasattr(model, "predict_proba"):
-
-        confidence = np.max(
-            model.predict_proba(image)
-        )
-
-    return label, confidence
+    return str(label[0])
 
 def split_label(label):
+
+    label = str(label)
 
     if label.startswith("Fresh"):
 
         fruit = label.replace("Fresh", "")
-
         condition = "Fresh"
 
     elif label.startswith("Rotten"):
 
         fruit = label.replace("Rotten", "")
-
         condition = "Rotten"
 
     else:
 
         fruit = label
-
         condition = "Unknown"
 
     return fruit, condition
