@@ -241,13 +241,7 @@ def train_svm(
 
     kernels = [
 
-        "linear",
-
-        "poly",
-
-        "rbf",
-
-        "sigmoid"
+        "linear"
 
     ]
 
