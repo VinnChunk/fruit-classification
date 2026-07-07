@@ -17,9 +17,10 @@ from config import DATASET_PATH
 def show_dataset():
 
     dataset_path = st.text_input(
-    "Dataset Folder",
-    DATASET_PATH)
-
+        "Dataset Folder",
+        os.path.join(DATASET_PATH, "train")
+    )
+    st.write("Dataset path:", dataset_path)
     st.subheader("📁 Dataset Information")
 
     if os.path.exists(dataset_path):
@@ -60,6 +61,11 @@ def show_dataset():
         )
 
         img = cv2.imread(img_path)
+
+        if img is None:
+            st.warning(f"Tidak dapat membaca gambar: {img_path}")
+            continue
+
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         plt.subplot(2, 3, i + 1)
