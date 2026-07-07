@@ -91,6 +91,11 @@ def load_dataset(dataset_path, img_size):
 
 def prepare_dataset(images, labels):
 
+    if len(images) == 0:
+        raise ValueError("Dataset kosong. Tidak ada gambar yang berhasil dimuat.")
+
+    images = np.array(images)
+    
     images = images.reshape(
         len(images),
         -1

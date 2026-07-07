@@ -9,6 +9,7 @@ Original file is located at
 
 import streamlit as st
 import pandas as pd
+import os
 
 from config import (
     DATASET_PATH,
@@ -46,7 +47,7 @@ def show_comparison():
     st.subheader("📂 Dataset Original")
 
     images_ori, labels_ori = load_dataset(
-        DATASET_PATH,
+        os.path.join(DATASET_PATH, "train"),
         IMG_SIZE_CLASSIFICATION
     )
 
@@ -85,7 +86,7 @@ def show_comparison():
     # Dataset Augmentation
     # ======================================
 
-    st.subheader("📂 Dataset Setelah Preprocessing")
+    st.subheader("📂 Dataset Setelah Augmentasi")
 
     images_aug, labels_aug = load_dataset(
         AUGMENT_PATH,
